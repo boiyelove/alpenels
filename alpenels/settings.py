@@ -25,7 +25,7 @@ SECRET_KEY = 'eln3xf7_=bh)f(rl85*bf-$)k#$uj9&v87w^l!e(3qn685r=l9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.alepenels.cf', 'localhost:8000']
 
 
 # Application definition

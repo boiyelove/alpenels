@@ -2,8 +2,7 @@ import yaml
 from requests_oauthlib import OAuth2Session
 import os
 import time
-from .models import ClientUser
-from django.conf.settings import BASE_DIR
+from django.conf import settings as conf_settings
 # This is necessary for testing with non-HTTPS localhost
 # Remove this if deploying to production
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -14,7 +13,7 @@ os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 os.environ['OAUTHLIB_IGNORE_SCOPE_CHANGE'] = '1'
 
 # Load the oauth_settings.yml file
-stream = open(os.path.join(BASE_DIR,'oauth_settings.yml'), 'r')
+stream = open(os.path.join(conf_settings.BASE_DIR,'oauth_settings.yml'), 'r')
 settings = yaml.load(stream)
 authorize_url = '{0}{1}'.format(settings['authority'], settings['authorize_endpoint'])
 token_url = '{0}{1}'.format(settings['authority'], settings['token_endpoint'])

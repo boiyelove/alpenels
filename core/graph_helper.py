@@ -9,7 +9,7 @@ def get_user(token):
 
   # Send GET to /me
   user = graph_client.get('{0}/me'.format(graph_url))
-  print('User is ', user)
+  print('User is ', user.json())
   # Return the JSON result
   return user.json()
   
@@ -94,6 +94,12 @@ class MailGraph(GraphClient):
     '''
     return mailfolder_list.json()
 
+  def get_folder_messages(self, id):
+    folder_messages = self.graph_client.get('{0}/me/mailFolders/{1}/messages'.format(graph_url, id))
+    return folder_messages.json()
+
+
+
   def create_draft_mail(self):
     body = {
     "contentType":"HTML",
@@ -113,31 +119,36 @@ class MailGraph(GraphClient):
 
     }
 
-  def send_mail(self):
+  def send_mail(self, to=[], subject=None, body=None, save_to_sent=False, cc=[]):
+    rc = []
+    for t in to:
+      rc.append([{    
+      "emailAddress": {
+            "address": t
+            }
+      }])
+    if cc:
+      tc = []
+      for c in co:
+        tc.append([{    
+        "emailAddress": {
+              "address": c
+              }
+        }])
+
     data = {
-    "message" :{
-    "subject": "Meet for lunch",
-    "body":{
-    "contentType":"Text",
-    "content": "the new cafeteria is open."
-    },
-    "toRecipients":[
-    {
-    "emailAddress": {
-            "address": "daahrmmieboiye+test1@gmail.com"
-        }
-      }
-    ],
-    "ccRecipients": [
-    {
-    "emailAddress": {
-    "address": "daahrmmieboiye+test2@gmail.com"
-          }
-        }
-      ]
-    },
-    "saveToSentItems": "false"
+      "message" :{
+      "subject": subject,
+      "body":{
+      "contentType":"HTML",
+      "content": body
+      },
+      "toRecipients": rc,
+      "ccRecipients": tc,
+        },
+      "saveToSentItems":  save_to_sent
     }
+
     new_mail = graph_client.post(url='/me/sendMail', params=data)
     return new_mail.json()
 

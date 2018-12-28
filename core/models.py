@@ -1,5 +1,5 @@
 from django.db import models
-from auth_helper import get_client_token
+from .auth_helper import get_client_token
 # Create your models here.
 
 class ClientUser(models.Model):
