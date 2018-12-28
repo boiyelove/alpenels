@@ -1,0 +1,16 @@
+{% extends "./layout.html" %}
+{% block content %}
+<div class="row">
+	<h1>Compose Mail</h1>
+</div>
+
+<div class="row">
+
+	  <form action="." method="post">
+  	{% csrf_token %}
+  	{{form.as_p}}
+  	<input type="submit" value="Send Mail"/>
+  </form>
+	</div>
+	
+{% endblock %}
