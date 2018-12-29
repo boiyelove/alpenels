@@ -6,15 +6,12 @@ graph_beta_url = 'https://graph.microsoft.com/beta'
 
 def get_user(token):
   graph_client = OAuth2Session(token=token)
-
-  # Send GET to /me
   user = graph_client.get('{0}/me'.format(graph_url))
-  print('User is ', user.json())
-  # Return the JSON result
   return user.json()
   
 
 def get_calendar_events(token):
+  print('token view', token)
   graph_client = OAuth2Session(token=token)
 
   # Configure query parameters to
@@ -23,18 +20,12 @@ def get_calendar_events(token):
     '$select': 'subject,organizer,start,end',
     '$orderby': 'createdDateTime DESC'
   }
-
-  # Send GET to /me/events
   events = graph_client.get('{0}/me/events'.format(graph_url), params=query_params)
-  # Return the JSON result
   return events.json()
 
 def get_contact_list(token):
   graph_client = OAuth2Session(token=token)
-
-  # Send GET to /me/events
   contact_list = graph_client.get('{0}/me/contacts'.format(graph_url))
-  # Return the JSON result
   return contact_list.json()
 
 
@@ -71,8 +62,12 @@ class MailGraph(GraphClient):
     '''
     return mails.json()
 
+  def get_inbox(self):
+    inbox = self.graph_client.get("{0}/me/mailFolders('Inbox')/messages".format(graph_url))
+    return inbox.json()
+
   def list_mailboxFolders(self):
-    mailfolder_list = self.graph_client.get('/me/mailFolders')
+    mailfolder_list = self.graph_client.get('{0}/me/mailFolders'.format(graph_url))
     '''
     SAMPLE RESPONSE
     HTTP/1.1 200 OK
@@ -135,7 +130,7 @@ class MailGraph(GraphClient):
               "address": c
               }
         }])
-
+    #         "ccRecipients": tc,
     data = {
       "message" :{
       "subject": subject,
@@ -144,12 +139,38 @@ class MailGraph(GraphClient):
       "content": body
       },
       "toRecipients": rc,
-      "ccRecipients": tc,
+
         },
       "saveToSentItems":  save_to_sent
     }
 
-    new_mail = graph_client.post(url='/me/sendMail', params=data)
+    [
+          {
+            "emailAddress": {
+              "address": "fannyd@contoso.onmicrosoft.com"
+            }
+          }
+        ]
+    [
+          {
+            "emailAddress": {
+              "address": "danas@contoso.onmicrosoft.com"
+            }
+          }
+        ]
+    data = {
+  "message": {
+        "subject": subject,
+        "body": {
+          "contentType": "HTML",
+          "content": body
+        },
+        "toRecipients": tc,
+        "ccRecipients": cc
+      },
+      "saveToSentItems": save_to_sent
+    }
+    new_mail = self.graph_client.post('{0}/me/sendMail'.format(graph_url), data=data)
     return new_mail.json()
 
 class SharePointGraph(GraphClient):

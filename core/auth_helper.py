@@ -46,7 +46,6 @@ def get_token_from_code(callback_url, expected_state):
   return token
 
 
-
 def store_token(request, token):
   request.session['oauth_token'] = token
 
@@ -63,7 +62,7 @@ def store_user(request, user):
 
 def get_token(request):
   token = request.session['oauth_token']
-  print('token is', token)
+  print('Insession retrieved token is', token)
   if token != None:
     now = time.time()
     expire_time = token['expires_at'] - 300
@@ -86,7 +85,7 @@ def get_token(request):
       return token
 
 def get_client_token(client):
-  token = client.access_token
+  token = client.token
   if token != None:
     now = time.time()
     expire_time = token['expires_at'] - 300
@@ -101,7 +100,7 @@ def get_client_token(client):
         'client_secret': settings['app_secret'],
       }
       token = aad_auth.refresh_token(token_url, **refresh_params)
-      client.access_token = token
+      client.token = token
       client.save()
     return token
 
