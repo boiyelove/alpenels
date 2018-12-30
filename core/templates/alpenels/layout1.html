@@ -1,0 +1,27 @@
+{% extends "./layout.html" %}
+{% block content %}
+<h1>Mail List</h1>
+    <div class="row">
+      <div class="col-3">
+        <div class="list-group">
+          <a href="{% url 'compose-mail' client_id %}" class="btn btn-primary btn-block">
+          Compose
+          </a>
+          <br>
+          <a href="{% url 'client-inbox' client_id %}" class="list-group-item list-group-item-action  {% if request.resolver_match.view_name == 'client-inbox' %} active{% endif %}">
+           Inbox
+          </a>
+          <a href="{% url 'client-sentitems' client_id %}" class="list-group-item list-group-item-action  {% if request.resolver_match.view_name == 'client-sentitems' %} active{% endif %}">Sent Items</a>
+          <a href="{% url 'client-drafts' client_id %}" class="list-group-item list-group-item-action  {% if request.resolver_match.view_name == 'client-drafts' %} active{% endif %}">Draft</a>
+          <a href="{% url 'client-trash' client_id %}" class="list-group-item list-group-item-action  {% if request.resolver_match.view_name == 'client-trash' %} active{% endif %}">Deleted Items</a>
+        </div>
+      </div>
+      <div class="col-9">
+      		{% block mailsection %}
+      		{% endblock %}
+      </div>
+    </div>
+
+      
+
+{% endblock %}
