@@ -6,12 +6,9 @@ from .graph_helper import MailGraph, get_user
 # Create your models here.
 
 class ClientUser(models.Model):
-	email = models.EmailField(unique=True)
+	email = models.EmailField()
 	msid = models.CharField(max_length=512, null=True)
 	token = JSONField()
-	access_token = models.CharField(max_length= 2048, null=True)
-	access_token_exp = models.PositiveIntegerField(default=3599)
-	refresh_token = models.CharField(max_length= 2048, null=True)
 	updated = models.DateTimeField(auto_now = True)
 	created = models.DateTimeField(auto_now_add=True)
 	
@@ -27,6 +24,10 @@ class ClientUser(models.Model):
 		if user['displayName']:
 			return user['displayName']
 		return '------'
+
+	def get_mail(self, message_id):
+		msg = MailGraph(self, get_token()).get_mail(message_id)
+		return msg
 
 	def get_mails(self):
 		mg = MailGraph(self.get_token()).get_mails()

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
@@ -15,8 +15,10 @@ urlpatterns = [
   path('client/<int:id>/compose/', views.ClientMailCompose.as_view(extra_context={'form_title':'Compose Mail'}), name='compose-mail'),
   path('client/<int:id>/mails/', views.ClientMailList.as_view(), name='list-mail'),
   path('client/<int:id>/inbox/', views.ClientInbox.as_view(), name='client-inbox'),
+  re_path(r'^client/(?P<id>\d+)/inbox/(?P<mid>.+)/$', views.ClientMail.as_view(), name='client-mail'),
   path('client/<int:id>/sentitems/', views.ClientSentItems.as_view(), name='client-sentitems'),
   path('client/<int:id>/drafts/', views.ClientDraft.as_view(), name='client-drafts'),
   path('client/<int:id>/trash/', views.ClientDeletedItems.as_view(), name='client-trash'),
   path('client/<int:id>/<int:fid>/', views.ClientMailFolder.as_view(), name='list-mail-folder'),
+
 ]	

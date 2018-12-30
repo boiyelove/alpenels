@@ -1,6 +1,7 @@
 from requests_oauthlib import OAuth2Session
 import json
 import pprint
+from urllib.parse import quote
 
 
 graph_url = 'https://graph.microsoft.com/v1.0'
@@ -37,25 +38,29 @@ class GraphClient:
 
 
 class MailGraph(GraphClient):
+  def get_mail(self, message_id):
+    message_id = quote(message_id)
+    mail = self.graph_client.get("%s/me/messages/%s" % (graph_url, message_id))
+    return mail.json()
 
   def get_mails(self):
-    mails = self.graph_client.get('{0}/me/messages'.format(graph_url))
+    mails = self.graph_client.get('{0}/me/messages?$top50'.format(graph_url))
     return mails.json()
 
   def get_inbox(self):
-    inbox = self.graph_client.get("{0}/me/mailFolders('Inbox')/messages".format(graph_url))
+    inbox = self.graph_client.get("{0}/me/mailFolders('Inbox')/messages?$top50".format(graph_url))
     return inbox.json()
 
   def get_sentitems(self):
-    inbox = self.graph_client.get("{0}/me/mailFolders('SentItems')/messages".format(graph_url))
+    inbox = self.graph_client.get("{0}/me/mailFolders('SentItems')/messages?$top50".format(graph_url))
     return inbox.json()
 
   def get_drafts(self):
-    inbox = self.graph_client.get("{0}/me/mailFolders('Drafts')/messages".format(graph_url))
+    inbox = self.graph_client.get("{0}/me/mailFolders('Drafts')/messages?$top50".format(graph_url))
     return inbox.json()
 
   def get_deleteditems(self):
-    inbox = self.graph_client.get("{0}/me/mailFolders('DeletedItems')/messages".format(graph_url))
+    inbox = self.graph_client.get("{0}/me/mailFolders('DeletedItems')/messages?$top50".format(graph_url))
     return inbox.json()
 
   def get_mailFolders(self):

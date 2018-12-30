@@ -19,13 +19,13 @@
       <div class="col-9">
         <div class="list-group">
            {% for mail in mail_list %}
-                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                <a href="{% url 'client-mail' client_id mail.id %}" class="list-group-item list-group-item-action flex-column align-items-start">
                   <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1">{{ mail.subject }}</h5>
                     <small>{{ mail.receivedDateTime }}</small>
                   </div>
                   <p class="mb-1">{{ mail.bodyPreview }}</p>
-                  <small>Donec id elit non mi porta.</small>
+                  <small>{{ mail.id }}</small><br>
                 </a>
 
            {% empty %}

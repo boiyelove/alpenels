@@ -1,26 +1,17 @@
-{% extends "./layout.html" %}
-{% block content %}
-<h1>Mail List</h1>
-    <div class="row">
-      <div class="col-3">
-        <div class="list-group">
-          <a href="{% url 'client-inbox' client_id %}" class="list-group-item list-group-item-action active">
+{% extends "./layout1.html" %}
 
-           Inbox {% if request.resolver_match.view_name == 'client-inbox' %} active{% endif %}
-          </a>
-          <a href="{% url 'client-sentitems' client_id %}" class="list-group-item list-group-item-action">Sent Items</a>
-          <a href="{% url 'client-drafts' client_id %}" class="list-group-item list-group-item-action">Draft</a>
-          <a href="{% url 'client-trash' client_id %}" class="list-group-item list-group-item-action">Deleted Items</a>
-        </div>
-      </div>
-      <div class="col-9">
-        <div class="well">
-        		{{mail_content}}
+
+{% block mailsection %}
+        <div class="row">
+          <div class="col bg-secondary" style="padding:2%;max-height:hv;overflow-y:scroll;overflow-x:wrap;">
+            <div class="panel panel-default">
+             <div class="panel-heading bg-secondary text-white" style="padding:0% 1% 1% 3%;"><h3>{{mail.subject|safe}}</h3>
+              <br><small>{{mail.receivedDateTIme}}</small></div>
+  <div class="panel-body bg-white"  style="padding:2%;">{{mail_body.content|safe}}</div>
+</div>
+           
+          </div>
+            
               </div>
-
-      </div>
-    </div>
-
-      
 
 {% endblock %}

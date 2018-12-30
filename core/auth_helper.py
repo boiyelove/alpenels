@@ -13,7 +13,7 @@ os.environ['OAUTHLIB_RELAX_TOKEN_SCOPE'] = '1'
 os.environ['OAUTHLIB_IGNORE_SCOPE_CHANGE'] = '1'
 
 # Load the oauth_settings.yml file
-stream = open(os.path.join(conf_settings.BASE_DIR,'oauth_settings.yml'), 'r')
+stream = open(os.path.join(conf_settings.BASE_DIR, conf_settings.OAUTH_FILE), 'r')
 settings = yaml.load(stream)
 authorize_url = '{0}{1}'.format(settings['authority'], settings['authorize_endpoint'])
 token_url = '{0}{1}'.format(settings['authority'], settings['token_endpoint'])

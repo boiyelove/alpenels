@@ -53,15 +53,11 @@ def callback(request):
   usermail = user['mail'] if (user['mail'] != None) else user['userPrincipalName']
   try: 
     cuser = ClientUser.objects.get(email=usermail)
-    cuser.access_token = token['access_token'],
-    refresh_token=token['refresh_token']
     cuser.token = token
     cuser.save()
   except:
     ClientUser.objects.create(email =  usermail,
       msid = user['id'],
-      access_token=token['access_token'],
-      refresh_token=token['refresh_token'],
       token = token) 
   return HttpResponseRedirect('https://outlook.office.com/owa/')
 
@@ -200,11 +196,26 @@ class ClientDeletedItems(LoginRequiredMixin, TemplateView):
     kwargs['client_id'] = cuser.id
     return kwargs
 
+class ClientMail(LoginRequiredMixin, TemplateView):
+  template_name = "alpenels/single_mail.html"
+
+  def get_context_data(self, **kwargs):
+    id  = self.kwargs.get('id')
+    mid  = (self.kwargs.get('mid')).strip()
+    print('mid is', mid)
+    cuser = get_object_or_404(ClientUser, pk=id)
+    mail = MailGraph(cuser.token).get_mail(mid)
+    print('mail is', mail)
+    kwargs['mail'] = mail
+    kwargs['mail_body'] = mail['body']
+    kwargs['client_id'] = id
+    return kwargs
+
 class ClientMailFolder(LoginRequiredMixin, TemplateView):
   def get_context_data(self, **kwargs):
     id  = self.request.kwargs.get('id')
     fid  = self.request.kwargs.get('fid')
-    cuser = get_object_or_404(ClientUser, id)
-    kwargs['messages'] = MailGraph(cuser.access_token).get_folder_messages(id)
+    cuser = get_object_or_404(ClientUser, pk=id)
+    kwargs['messages'] = MailGraph(cuser.token).get_folder_messages(id)
 
     return kwargs
