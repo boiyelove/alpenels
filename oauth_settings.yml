@@ -1,7 +1,0 @@
-app_id: 13c2bf75-1775-4aa1-8e04-dcd9a00efb32
-app_secret: ncdgFQ3())?qziGYJFQ9327
-redirect: http://localhost:8000/callback
-scopes: openid offline_access profile user.read mail.readwrite mail.send directory.readwrite.all directory.accessasuser.all
-authority: https://login.microsoftonline.com/common
-authorize_endpoint: /oauth2/v2.0/authorize
-token_endpoint: /oauth2/v2.0/token
