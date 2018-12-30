@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'alpenels.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 try:
-    from .pro_config import *
+    from .prod_config import *
 except:
     from .local_config import *
 
