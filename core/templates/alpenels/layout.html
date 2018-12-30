@@ -40,22 +40,18 @@
             {% if user.is_authenticated %}
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                  {% if user.avatar %}
-                    <img src="{{ user.avatar }}" class="rounded-circle align-self-center mr-2" style="width: 32px;">
-                  {% else %}
                     <i class="far fa-user-circle fa-lg rounded-circle align-self-center mr-2" style="width: 32px;"></i>
-                  {% endif %}
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
-                  <h5 class="dropdown-item-text mb-0">{{ user.name }}</h5>
+                  <h5 class="dropdown-item-text mb-0">{{ request.user.username }}</h5>
                   <p class="dropdown-item-text text-muted mb-0">{{ user.email }}</p>
                   <div class="dropdown-divider"></div>
-                  <a href="{% url 'signout' %}" class="dropdown-item">Sign Out</a>
+                  <a href="{% url 'logout' %}" class="dropdown-item">logOut</a>
                 </div>
               </li>
             {% else %}
               <li class="nav-item">
-                <a href="{% url 'signin' %}" class="nav-link">Sign In</a>
+                <a href="{% url 'login' %}" class="nav-link">Alpenels Login</a>
               </li>
             {% endif %}
           </ul>
