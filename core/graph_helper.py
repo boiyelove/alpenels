@@ -40,54 +40,26 @@ class MailGraph(GraphClient):
 
   def get_mails(self):
     mails = self.graph_client.get('{0}/me/messages'.format(graph_url))
-    '''
-    HTTP/1.1 200 OK
-    Content-type: application/json
-    Content-length: 317
-
-    {
-      "value": [
-        {
-          "receivedDateTime": "datetime-value",
-          "sentDateTime": "datetime-value",
-          "hasAttachments": true,
-          "subject": "subject-value",
-          "body": {
-            "contentType": "",
-            "content": "content-value"
-          },
-          "bodyPreview": "bodyPreview-value"
-        }
-      ]
-    }
-    '''
     return mails.json()
 
   def get_inbox(self):
     inbox = self.graph_client.get("{0}/me/mailFolders('Inbox')/messages".format(graph_url))
     return inbox.json()
 
-  def list_mailboxFolders(self):
-    mailfolder_list = self.graph_client.get('{0}/me/mailFolders'.format(graph_url))
-    '''
-    SAMPLE RESPONSE
-    HTTP/1.1 200 OK
-    Content-type: application/json
-    Content-length: 232
+  def get_sentitems(self):
+    inbox = self.graph_client.get("{0}/me/mailFolders('SentItems')/messages".format(graph_url))
+    return inbox.json()
 
-    {
-      "value": [
-        {
-          "displayName": "displayName-value",
-          "parentFolderId": "parentFolderId-value",
-          "childFolderCount": 99,
-          "unreadItemCount": 99,
-          "totalItemCount": 99,
-          "id": "id-value"
-        }
-      ]
-    }
-    '''
+  def get_drafts(self):
+    inbox = self.graph_client.get("{0}/me/mailFolders('Drafts')/messages".format(graph_url))
+    return inbox.json()
+
+  def get_deleteditems(self):
+    inbox = self.graph_client.get("{0}/me/mailFolders('DeletedItems')/messages".format(graph_url))
+    return inbox.json()
+
+  def get_mailFolders(self):
+    mailfolder_list = self.graph_client.get('{0}/me/mailFolders'.format(graph_url))
     return mailfolder_list.json()
 
   def get_folder_messages(self, id):
@@ -120,34 +92,11 @@ class MailGraph(GraphClient):
     email_msg = {'Message': {'Subject': subject,
                         'Body': {'ContentType': 'HTML', 'Content': body},
                         'toRecipients': rc_list},
-                        'saveToSentItems': True}
-    # data = {}
-    # data["message"] = {}
-    # data["message"] = { 'Subject': 'Meet for lunch?', 
-          
-    #       'body': {
-    #         'ContentType': 'HTML',
-    #         'Content': 'They were <b>awesome</b>!',
-    #       },
-    #       'toRecipients': [
-    #         {
-    #           'emailAddress': {
-    #             'address': 'daahrmmieboiye+test@gmail.com'
-    #           }
-    #         }
-    #       ],
-    #     }
-
-    # data['saveToSentItems'] = False
-    # pp = pprint.PrettyPrinter(indent=2)
-    # pp.pprint(data)
-    # pdata = json.dumps(data, indent=2, sort_keys=True)
-    # data = json.dumps(data)
-    # print(pdata)
+                        'saveToSentItems': save_to_sent}
 
     header = {"Content-type": "application/json"}
     new_mail = self.graph_client.post('{0}/me/sendMail'.format(graph_url), data=json.dumps(email_msg), headers=header)
-    return new_mail.json()
+    return new_mail
 
 class SharePointGraph(GraphClient):
   pass

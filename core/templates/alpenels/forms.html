@@ -1,16 +1,26 @@
 {% extends "./layout.html" %}
+{% load bootstrap4 %}
 {% block content %}
 <div class="row">
-	<h1>{{ form_title }}</h1>
+	<h1 class="mx-auto">{{ form_title }}</h1>
 </div>
-
+{% if description %}
+<div class="row" style="margin-top:20px;margin-bottom:50px; font-style: italic;">
+	<div class="col-6 mx-auto">{{description | safe}} <br><a href="{% url 'client-inbox' client_id %}" class="btn btn-danger btn-sm">
+          Back to inbox
+          </a></div>
+	
+</div>
+{% endif %}
 <div class="row">
-
+	<div class="col-6 mx-auto">
 	  <form action="." method="post">
   	{% csrf_token %}
-  	{{form.as_p}}
-  	<input type="submit" value="Send Mail"/>
+  	{% bootstrap_form form %}
+  	<button type="submit" class="btn btn-primary btn-block">Send Mail</button>
+
   </form>
+</div>
 	</div>
 	
 {% endblock %}

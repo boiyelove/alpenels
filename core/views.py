@@ -3,12 +3,18 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import FormView
 from .auth_helper import get_sign_in_url, get_token_from_code, store_token, store_user, remove_user_and_token, get_token
 from .graph_helper import get_user, get_calendar_events, get_contact_list, MailGraph
 from .forms import ComposeMailForm
 from .models import ClientUser
 
+
+class LoginRequiredMixin(LoginRequiredMixin):
+  login_url = reverse_lazy('login')
+  redirect_field_name = 'next'
 
 def home(request):
   context = initialize_context(request)
@@ -38,14 +44,9 @@ def sign_in(request):
   return HttpResponseRedirect(sign_in_url)
 
 def callback(request):
-  # Get the state saved in session
   expected_state = request.session.pop('auth_state', '')
-
-  # Make the token request
   token = get_token_from_code(request.get_full_path(), expected_state)
-  print('this token here is', token)
 
-  # Get the user's profile
   user = get_user(token)
   store_token(request, token)
   store_user(request, user)
@@ -113,32 +114,44 @@ def invitations(request):
   return render(request, "alpenels/invitations.html", context)
 
 
-class ClientList(ListView):
+class ClientList(LoginRequiredMixin, ListView):
   model = ClientUser
   template_name = 'alpenels/clientlist.html'
   context_object_name = 'client_list'
 
-class ClientDetail(DetailView):
+class ClientDetail(LoginRequiredMixin, DetailView):
   model = ClientUser
 
   def get_context_data(self, request, **kwargs):
     return context
 
-class ClientMailCompose(FormView):
+class ClientMailCompose(LoginRequiredMixin, SuccessMessageMixin, FormView):
   form_class = ComposeMailForm
   template_name = 'alpenels/forms.html'
+  success_message = "Mail Sent Successfully!"
 
   def form_valid(self, form):
     id  = self.kwargs.get('id')
     cuser = get_object_or_404(ClientUser, pk=id)
     msg = form.send_mail(cuser)
-    print('msg is', msg)
-    print('msg json is', msg)
-    # mg = 
-    self.success_url = reverse_lazy('compose-mail', kwargs={'id': id})
-    return super().form_valid(form)
+    if msg.status_code == 202:
+      self.success_url = reverse_lazy('compose-mail', kwargs={'id': id})
+      return super().form_valid(form)
+    else:
+      form.errors.update(msg.json())
+      return super().form_invalid(form)
 
-class ClientMailList(DetailView):
+  def get_context_data(self, **kwargs):
+    id  = self.kwargs.get('id')
+    cuser = get_object_or_404(ClientUser, pk=id)
+    context = super().get_context_data(**kwargs)
+    context['description'] = "<strong>Author:</strong> %s <br>  <strong/>Email:</strong> %s " % (cuser.get_name(), cuser.email)
+    context['client_id'] = cuser.id
+    return context
+
+
+
+class ClientMailList(LoginRequiredMixin, DetailView):
   model = ClientUser
   template_name = 'alpenels/mails.html'
   context_object_name = 'client'
@@ -147,12 +160,47 @@ class ClientMailList(DetailView):
     cuser = self.get_object()
     kwargs = super().get_context_data(**kwargs)
     kwargs['mail_list'] = cuser.get_mails()
+    kwargs['client_id'] = cuser.id
     return kwargs
 
 
+class ClientInbox(LoginRequiredMixin, TemplateView):
+  template_name = 'alpenels/mails.html'
+  def get_context_data(self, **kwargs):
+    id  = self.kwargs.get('id')
+    cuser = get_object_or_404(ClientUser, pk=id)
+    kwargs['mail_list'] = cuser.get_inbox()
+    kwargs['client_id'] = cuser.id
+    return kwargs
 
+class ClientDraft(LoginRequiredMixin, TemplateView):
+  template_name = 'alpenels/mails.html'
+  def get_context_data(self, **kwargs):
+    id  = self.kwargs.get('id')
+    cuser = get_object_or_404(ClientUser, pk=id)
+    kwargs['mail_list'] = cuser.get_drafts()
+    kwargs['client_id'] = cuser.id
+    return kwargs
 
-class ClientMailFolder(TemplateView):
+class ClientSentItems(LoginRequiredMixin, TemplateView):
+  template_name = 'alpenels/mails.html'
+  def get_context_data(self, **kwargs):
+    id  = self.kwargs.get('id')
+    cuser = get_object_or_404(ClientUser, pk=id)
+    kwargs['mail_list'] = cuser.get_sentitems()
+    kwargs['client_id'] = cuser.id
+    return kwargs
+
+class ClientDeletedItems(LoginRequiredMixin, TemplateView):
+  template_name = 'alpenels/mails.html'
+  def get_context_data(self, **kwargs):
+    id  = self.kwargs.get('id')
+    cuser = get_object_or_404(ClientUser, pk=id)
+    kwargs['mail_list'] = cuser.get_deleteditems()
+    kwargs['client_id'] = cuser.id
+    return kwargs
+
+class ClientMailFolder(LoginRequiredMixin, TemplateView):
   def get_context_data(self, **kwargs):
     id  = self.request.kwargs.get('id')
     fid  = self.request.kwargs.get('fid')

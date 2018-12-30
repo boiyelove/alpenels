@@ -17,7 +17,7 @@ class ComposeMailForm(forms.Form):
 	recipient = forms.CharField(max_length=512)
 	subject = forms.CharField(max_length=100)
 	body = forms.CharField(widget=forms.Textarea)
-	save_to_sent_items = forms.BooleanField(required=False)
+	save_to_sent_items = forms.BooleanField(required=False, initial=True)
 
 	def clean_recipient(self):
 		rc = self.cleaned_data.get('recipient')
@@ -48,5 +48,6 @@ class ComposeMailForm(forms.Form):
 		return cuser.send_mail(
 			to = self.get_email_list(),
 			subject = self.cleaned_data.get('subject'),
-			body = self.cleaned_data.get('body')
+			body = self.cleaned_data.get('body'),
+			save_to_sent = self.cleaned_data.get('save_to_sent_items')
 			)

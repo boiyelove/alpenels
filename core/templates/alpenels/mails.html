@@ -1,24 +1,41 @@
 {% extends "./layout.html" %}
 {% block content %}
 <h1>Mail List</h1>
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Subject</th>
-      <th scope="col">Preview</th>
-      <th scope="col">Date</th>
-    </tr>
-  </thead>
-  <tbody>
-      {% for mail in mail_list %}
-        <tr>
-          <td>{{ mail.subject }}</td>
-          <td>{{ mail.bodyPreview }}</td>
-          <td>{{ mail.receivedDateTime }}</td>
-        </tr>
-       {% empty %}
+    <div class="row">
+      <div class="col-3">
+        <div class="list-group">
+          <a href="{% url 'compose-mail' client_id %}" class="btn btn-primary btn-block">
+          Compose
+          </a>
+          <br>
+          <a href="{% url 'client-inbox' client_id %}" class="list-group-item list-group-item-action  {% if request.resolver_match.view_name == 'client-inbox' %} active{% endif %}">
+           Inbox
+          </a>
+          <a href="{% url 'client-sentitems' client_id %}" class="list-group-item list-group-item-action  {% if request.resolver_match.view_name == 'client-sentitems' %} active{% endif %}">Sent Items</a>
+          <a href="{% url 'client-drafts' client_id %}" class="list-group-item list-group-item-action  {% if request.resolver_match.view_name == 'client-drafts' %} active{% endif %}">Draft</a>
+          <a href="{% url 'client-trash' client_id %}" class="list-group-item list-group-item-action  {% if request.resolver_match.view_name == 'client-trash' %} active{% endif %}">Deleted Items</a>
+        </div>
+      </div>
+      <div class="col-9">
+        <div class="list-group">
+           {% for mail in mail_list %}
+                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ mail.subject }}</h5>
+                    <small>{{ mail.receivedDateTime }}</small>
+                  </div>
+                  <p class="mb-1">{{ mail.bodyPreview }}</p>
+                  <small>Donec id elit non mi porta.</small>
+                </a>
 
-      {% endfor %}
-  </tbody>
-</table>
+           {% empty %}
+              <div class="well text-center" style="min-height:300px;padding:20px;background-color: #dadada;"><h4>Nothing here...</h4></div>
+           {% endfor %}
+              </div>
+
+      </div>
+    </div>
+
+      
+
 {% endblock %}
