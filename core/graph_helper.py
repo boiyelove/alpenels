@@ -1,7 +1,9 @@
 from requests_oauthlib import OAuth2Session
 import json
 import pprint
+import requests
 from urllib.parse import quote
+from .auth_helper import get_app_token
 
 
 graph_url = 'https://graph.microsoft.com/v1.0'
@@ -31,10 +33,45 @@ def get_contact_list(token):
   return contact_list.json()
 
 
+
+
+
+
+
+
+
+
+
 class GraphClient:
     def __init__(self, token):
       self.token = token
       self.graph_client = OAuth2Session(token=token)
+
+
+
+def send_invite_mail(display_name=None, email=None, body=None, invite_rdr_url=None):
+    token = get_app_token()
+    message = {"customizedMessageBody": body}
+    data = {
+    "invitedUserDisplayName": display_name,
+    "invitedUserEmailAddress": email,
+    "inviteRedirectUrl": invite_rdr_url,
+    "sendInvitationMessage": True,
+    "invitedUserMessageInfo": message,
+    }
+    header = {
+    'Authorization': 'Bearer {0}'.format(token['access_token']),
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    }
+
+  
+
+
+    invitation = requests.post("{0}/invitations".format(graph_url),
+      data=json.dumps(data),
+      headers=header)
+    return invitation.json()
 
 
 class MailGraph(GraphClient):
@@ -103,20 +140,11 @@ class MailGraph(GraphClient):
     new_mail = self.graph_client.post('{0}/me/sendMail'.format(graph_url), data=json.dumps(email_msg), headers=header)
     return new_mail
 
+
 class SharePointGraph(GraphClient):
   pass
 
 
-class InvitationGraph(GraphClient):
-    def send_invite(self, email, rdrurl, message):
-      data = {
-      "invitedUserEmailAddress": email,
-      "inviteRedirectUrl": rdrurl,
-      "customizedMessageBody": message,
-      "sendInvitationMessage": True
-      }
-      invite = self.graph_client.post('{0}/invitations'.format(graph_url))
-      return invite.json()
 
 
 

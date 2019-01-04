@@ -1,4 +1,5 @@
 import yaml
+import requests
 from requests_oauthlib import OAuth2Session
 import os
 import time
@@ -18,31 +19,24 @@ settings = yaml.load(stream)
 authorize_url = '{0}{1}'.format(settings['authority'], settings['authorize_endpoint'])
 token_url = '{0}{1}'.format(settings['authority'], settings['token_endpoint'])
 
-# Method to generate a sign-in url
 def get_sign_in_url():
-  # Initialize the OAuth client
   aad_auth = OAuth2Session(settings['app_id'],
     scope=settings['scopes'],
     redirect_uri=settings['redirect'])
-
   sign_in_url, state = aad_auth.authorization_url(authorize_url, prompt='login')
-
   return sign_in_url, state
 
 
 
 # Method to exchange auth code for access token
 def get_token_from_code(callback_url, expected_state):
-  # Initialize the OAuth client
   aad_auth = OAuth2Session(settings['app_id'],
     state=expected_state,
     scope=settings['scopes'],
     redirect_uri=settings['redirect'])
-
   token = aad_auth.fetch_token(token_url,
     client_secret = settings['app_secret'],
     authorization_response=callback_url)
-
   return token
 
 
@@ -103,6 +97,22 @@ def get_client_token(client):
       client.token = token
       client.save()
     return token
+
+def get_app_token():
+  token_url = "https://login.microsoftonline.com/11f6f145-fcdf-435e-aef0-ed2178842339/oauth2/v2.0/token"
+  scope="https://graph.microsoft.com/.default"
+  header = {
+  "Content_Type": "application/x-www-form-urlencoded"
+  }
+  data = {
+  "client_id": settings['app_id'],
+  "scope" : scope,
+  "client_secret": settings['app_secret'],
+  "grant_type": "client_credentials",
+  }
+  token= requests.post(token_url, data=data, headers=header)
+  return token.json()
+
 
 def remove_user_and_token(request):
   if 'oauth_token' in request.session:

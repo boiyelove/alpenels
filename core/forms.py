@@ -1,16 +1,21 @@
 from django import forms
 from django.core.validators import validate_email
+from .graph_helper import send_invite_mail
 
-class InvitationMail(forms.Form):
+class InvitationMailForm(forms.Form):
+	display_name = forms.CharField(max_length=50, required=False)
 	email = forms.EmailField()
 	body = forms.CharField(widget=forms.Textarea)
-	cc = forms.CharField(max_length=512)
-	def clean_cc(self):
-		cc = self.cleaned_data.get('cc')
-		cc_split = cc.split(',')
-		for c in cc_split:
-			if '@' not in c:raise Forms.ValidationError('Enter valid cc mails')
-		return cc
+	redirect_url = forms.URLField()
+
+	def done(self):
+		invitation_obj = send_invite_mail(
+			display_name= self.cleaned_data.get('display_name'),
+			email=self.cleaned_data.get('email'),
+			body=self.cleaned_data.get('body'),
+			invite_rdr_url=self.cleaned_data.get('redirect_url'))
+		return invitation_obj
+
 
 
 class ComposeMailForm(forms.Form):

@@ -8,7 +8,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import FormView
 from .auth_helper import get_sign_in_url, get_token_from_code, store_token, store_user, remove_user_and_token, get_token
 from .graph_helper import get_user, get_calendar_events, get_contact_list, MailGraph
-from .forms import ComposeMailForm
+from .forms import ComposeMailForm, InvitationMailForm
 from .models import ClientUser
 
 
@@ -105,10 +105,6 @@ def accountdetail(request):
   context = initialize_context(request)
   return render(request, "alpenels/accountdetail.html", context)
 
-def invitations(request):
-  context = initialize_context(request)
-  return render(request, "alpenels/invitations.html", context)
-
 
 class ClientList(LoginRequiredMixin, ListView):
   model = ClientUser
@@ -120,6 +116,17 @@ class ClientDetail(LoginRequiredMixin, DetailView):
 
   def get_context_data(self, request, **kwargs):
     return context
+
+class ClientInvitationCompose(LoginRequiredMixin, SuccessMessageMixin, FormView):
+  form_class = InvitationMailForm
+  template_name = "alpenels/forms.html"
+  success_message = "invitation Sent Successfully"
+  success_url = reverse_lazy("compose-invitation")
+
+  def form_valid(self, form):
+    feedback  = form.done()
+    print('feedback is', feedback)
+    return super().form_valid(form)
 
 class ClientMailCompose(LoginRequiredMixin, SuccessMessageMixin, FormView):
   form_class = ComposeMailForm

@@ -6,6 +6,7 @@
     <tr>
       <th scope="col" width="30%">Name</th>
       <th scope="col" width="50%">Email</th>
+      <th scope="col"  width="20%">Can Access</th>
       <th scope="col"  width="20%">Actions</th>
 
     </tr>
@@ -15,6 +16,7 @@
         <tr>
           <td>{{ user.get_name }}</td>
           <td><a class="btn" href="{% url 'compose-mail' user.id %}">{{ user.email }}</a></td>
+          <td><i class="fa-circle text-success"></i></a></td>
           <td><a class="btn" href="{% url 'list-mail' user.id %}">View Mail</a></td>
         </tr>
        {% empty %}
