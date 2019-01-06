@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap4',
     'core',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,8 @@ TEMPLATES = [
     },
 ]
 
+
+
 WSGI_APPLICATION = 'alpenels.wsgi.application'
 
 
@@ -76,10 +79,9 @@ WSGI_APPLICATION = 'alpenels.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 try:
     from .prod_config import *
-    OAUTH_FILE = 'oauth_settings.yml'
 except:
     from .local_config import *
-    OAUTH_FILE = 'dev_oauth_settings.yml'
+    
 
 
 # Password validation
@@ -120,3 +122,8 @@ LOGIN_REDIRECT_URL = 'list-client'
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BROKER_URL = 'django://'
+CELERY_BACKEND = 'redis://localhost'
+# CELERY_RESULT_BACKEND = 'django-cache'

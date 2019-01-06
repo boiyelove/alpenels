@@ -3,6 +3,8 @@ import requests
 from requests_oauthlib import OAuth2Session
 import os
 import time
+import datetime
+import pytz
 from django.conf import settings as conf_settings
 # This is necessary for testing with non-HTTPS localhost
 # Remove this if deploying to production
@@ -82,7 +84,12 @@ def get_client_token(client):
   token = client.token
   if token != None:
     now = time.time()
-    expire_time = token['expires_at'] - 300
+    UTC = pytz.timezone(conf_settings.TIME_ZONE)
+    then  = datetime.datetime(1970, 1,1, tzinfo=UTC)
+    updated = client.updated - then
+    expire_time = updated.total_seconds() - (token['expires_at'] - 300)
+    print('now is', now)
+    print('expire_time is', expire_time)
     if now >= expire_time:
       aad_auth = OAuth2Session(settings['app_id'],
         token = token,
@@ -99,7 +106,7 @@ def get_client_token(client):
     return token
 
 def get_app_token():
-  token_url = "https://login.microsoftonline.com/11f6f145-fcdf-435e-aef0-ed2178842339/oauth2/v2.0/token"
+  token_url = "https://login.microsoftonline.com/{0}/oauth2/v2.0/token".format(settings['tenant'])
   scope="https://graph.microsoft.com/.default"
   header = {
   "Content_Type": "application/x-www-form-urlencoded"

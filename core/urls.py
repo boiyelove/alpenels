@@ -14,6 +14,9 @@ urlpatterns = [
   path('client/<int:id>/', views.ClientDetail.as_view, name='client-detail'),
   path('client/<int:id>/compose/', views.ClientMailCompose.as_view(extra_context={'form_title':'Compose Mail'}), name='compose-mail'),
   path('invitations/compose/', views.ClientInvitationCompose.as_view(extra_context={'form_title':"Compose Invitation"}), name="compose-invitation"),
+  path('invitations/mass-invite/', views.ClientMassInvite.as_view(extra_context={'form_title':"Mass Invitation"}), name="mass-invitation"),
+  # path('invitations/', views.ClientInvitationList.as_view(extra_context={'form_title':"Invitations"}), name="list-invitation"),
+
   path('client/<int:id>/mails/', views.ClientMailList.as_view(), name='list-mail'),
   path('client/<int:id>/inbox/', views.ClientInbox.as_view(), name='client-inbox'),
   path('client/<int:id>/sentitems/', views.ClientSentItems.as_view(), name='client-sentitems'),

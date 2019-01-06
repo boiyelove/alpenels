@@ -65,14 +65,24 @@ def send_invite_mail(display_name=None, email=None, body=None, invite_rdr_url=No
     'Content-Type': 'application/json',
     }
 
-  
-
-
     invitation = requests.post("{0}/invitations".format(graph_url),
       data=json.dumps(data),
       headers=header)
     return invitation.json()
 
+
+def list_invitations():
+    token = get_app_token()
+    header = {
+    'Authorization': 'Bearer {0}'.format(token['access_token']),
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    }
+
+    invitations = requests.get("https://graph.microsoft.com/beta/users?filter=externalUserState".format(graph_url),
+      headers=header)
+    # https://graph.microsoft.com/beta/users?filter=externalUserState
+    return invitations.json()
 
 class MailGraph(GraphClient):
   def get_mail(self, message_id):

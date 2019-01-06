@@ -1,12 +1,25 @@
 from django import forms
 from django.core.validators import validate_email
+from .models import InvitationMail, MassInvite
 from .graph_helper import send_invite_mail
 
-class InvitationMailForm(forms.Form):
+class InvitationMailForm(forms.ModelForm):
 	display_name = forms.CharField(max_length=50, required=False)
 	email = forms.EmailField()
 	body = forms.CharField(widget=forms.Textarea)
 	redirect_url = forms.URLField()
+
+	class Meta:
+		model = InvitationMail
+		exclude  = ('reply_data','sent')
+
+	def clean_email(self):
+		email = self.cleaned_data.get('email')
+		exists = InvitationMail.objects.filter(email=email)
+		if exists:
+			raise forms.ValidationError('An invitation has already been sent to this email address')
+		return email
+
 
 	def done(self):
 		invitation_obj = send_invite_mail(
@@ -15,7 +28,6 @@ class InvitationMailForm(forms.Form):
 			body=self.cleaned_data.get('body'),
 			invite_rdr_url=self.cleaned_data.get('redirect_url'))
 		return invitation_obj
-
 
 
 class ComposeMailForm(forms.Form):
@@ -56,3 +68,10 @@ class ComposeMailForm(forms.Form):
 			body = self.cleaned_data.get('body'),
 			save_to_sent = self.cleaned_data.get('save_to_sent_items')
 			)
+
+class MassInviteForm(forms.ModelForm):
+	file_upload = forms.FileField(widget=forms.FileInput(attrs={'accept':'application/vnd.ms-excel'}))
+
+	class Meta:
+		model = MassInvite
+		fields = '__all__'

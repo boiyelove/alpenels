@@ -5,10 +5,10 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, CreateView
 from .auth_helper import get_sign_in_url, get_token_from_code, store_token, store_user, remove_user_and_token, get_token
 from .graph_helper import get_user, get_calendar_events, get_contact_list, MailGraph
-from .forms import ComposeMailForm, InvitationMailForm
+from .forms import ComposeMailForm, InvitationMailForm, MassInviteForm
 from .models import ClientUser
 
 
@@ -117,16 +117,48 @@ class ClientDetail(LoginRequiredMixin, DetailView):
   def get_context_data(self, request, **kwargs):
     return context
 
-class ClientInvitationCompose(LoginRequiredMixin, SuccessMessageMixin, FormView):
+class ClientInvitationCompose(LoginRequiredMixin, SuccessMessageMixin, CreateView):
   form_class = InvitationMailForm
   template_name = "alpenels/forms.html"
   success_message = "invitation Sent Successfully"
   success_url = reverse_lazy("compose-invitation")
 
   def form_valid(self, form):
+    # form.cleaned_data.get('email')
     feedback  = form.done()
     print('feedback is', feedback)
+    form.reply_data = feedback
+    form.sent = feedback["sendInvitationMessage"]
     return super().form_valid(form)
+
+
+# class ClientInvitationList(LoginRequiredMixin, View):
+#   template_name = 'invitation_list.html'
+
+class ClientMassInvite(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+  form_class = MassInviteForm
+  template_name = "alpenels/mass_invite_form.html"
+  success_message = 'File uplaoded successfull, invites will be sent'
+  success_url = reverse_lazy('mass-invitation')
+
+  # def form_valid(self, form):
+  #   result = form.done()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class ClientMailCompose(LoginRequiredMixin, SuccessMessageMixin, FormView):
   form_class = ComposeMailForm

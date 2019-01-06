@@ -27,9 +27,14 @@
             </li>
             {% if user.is_authenticated %}
              <li class="nav-item" data-turbolinks="false">
-              <a class="nav-link{% if request.resolver_match.view_name == 'mail' %} active{% endif %}" href="{% url 'list-client' %}">Clients</a>
+              <a class="nav-link{% if request.resolver_match.view_name == 'list-clien' %} active{% endif %}" href="{% url 'list-client' %}">Clients</a>
               </li>
-
+             <li class="nav-item" data-turbolinks="false">
+              <a class="nav-link{% if request.resolver_match.view_name == 'compose-invitation' %} active{% endif %}" href="{% url 'compose-invitation' %}">Invitations</a>
+              </li>
+            <li class="nav-item" data-turbolinks="false">
+              <a class="nav-link{% if request.resolver_match.view_name == 'mass-invitation' %} active{% endif %}" href="{% url 'mass-invitation' %}">Mass Invitation</a>
+              </li>
 
             {% endif %}
           </ul>
