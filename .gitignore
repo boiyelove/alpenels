@@ -1,5 +1,6 @@
 oauth_settings.yml
 prod_config.py
+local_config.py
 rod_config.py
 dev_oauth_settings.yml
 dev2_oauth_settings.yml
