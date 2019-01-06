@@ -79,8 +79,10 @@ WSGI_APPLICATION = 'alpenels.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 try:
     from .prod_config import *
+    OAUTH_FILE = 'dev_oauth_settings.yml'
 except:
     from .local_config import *
+    OAUTH_FILE = 'oauth_settings.yml'
     
 
 
